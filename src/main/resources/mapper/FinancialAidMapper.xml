@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.graduation.freshmanwelcome.mapper.FinancialAidMapper">
+
+    <update id="updateByStudentId">
+        update financial_aid set deduction=#{deduction}
+        where student_id=#{studentId};
+    </update>
+    <update id="checkLoanFail">
+        UPDATE freshman_welcome.financial_aid
+        SET audit_status='1' WHERE student_id=#{studentId};
+    </update>
+    <update id="checkLoanSuccess">
+        UPDATE freshman_welcome.financial_aid
+        SET deduction=#{deductFee},audit_status='2'
+        WHERE student_id=#{studentId};
+    </update>
+    <!-- 查询某专业全部贷款信息 -->
+    <select id="queryMajorFinancialAid" resultType="org.graduation.freshmanwelcome.entity.FinancialAid">
+        SELECT financial_aid.*
+        FROM financial_aid
+        join student
+        on student.student_id = financial_aid.student_id
+        join stu_class
+        on stu_class.class_id = student.class_id
+        join college_major
+        on stu_class.college_major_id = college_major.college_major_id
+        join college
+        on college.college_id = college_major.college_id
+        join major
+        on major.major_id = college_major.major_id
+        where major.major_id = #{majorId} and college.college_id = #{collegeId}
+    </select>
+    <select id="queryInfoPath" resultType="java.lang.String">
+        SELECT document_path FROM freshman_welcome.financial_aid where student_id = #{studentId};
+    </select>
+</mapper>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.graduation.freshmanwelcome.mapper.HeadteacherMapper">
+    <update id="updateTeacherById" parameterType="org.graduation.freshmanwelcome.entity.Headteacher">
+        UPDATE headteacher SET headteacher_name=#{headteacherName}, phone=#{phone},
+         address=#{address}, gender=#{gender} WHERE headteacher_id=#{headteacherId};
+    </update>
+    <select id="queryMajorHeadteacher" resultType="org.graduation.freshmanwelcome.DTO.HeadteacherInfoDTO">
+        SELECT headteacher.*,stu_class.class_name
+        FROM headteacher
+        join stu_class
+        on stu_class.headteacher_id = headteacher.headteacher_id
+        join college_major
+        on stu_class.college_major_id = college_major.college_major_id
+        join college
+        on college.college_id = college_major.college_id
+        join major
+        on major.major_id = college_major.major_id
+        where major.major_id = #{majorId} and college.college_id = #{collegeId};
+    </select>
+</mapper>

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.graduation.freshmanwelcome.mapper.MajorMapper">
+
+    <!-- 查询专业所有学生的基本信息 -->
+    <select id="queryStudentBasicByMajor" resultType="org.graduation.freshmanwelcome.DTO.StudentBasicDTO">
+        SELECT student.student_id,student.exam_id,student.student_name,student.gender,
+        college.college_name,major.major_name,stu_class.class_name,
+        student.id_number,student.cradle,
+        student.pay_status,student.register_status,student.info_status
+		FROM student
+        join stu_class
+		on student.class_id = stu_class.class_id
+        join college_major
+		on stu_class.college_major_id = college_major.college_major_id
+        join major
+        on major.major_id = college_major.major_id
+        join college
+        on college.college_id = college_major.college_id
+        where college.college_id = #{collegeId} and major.major_id = #{majorId}
+    </select>
+
+    <!-- 查询专业所有学生的详细信息 -->
+    <select id="getStudentDetailsByMajor" resultType="org.graduation.freshmanwelcome.DTO.StudentDetailsDTO">
+        SELECT student.*,
+        parents_contact.father_name, parents_contact.father_phone, parents_contact.mother_name,
+        parents_contact.mother_phone, parents_contact.emergency_contact_name,
+        parents_contact.emergency_contact_phone,
+        stu_class.class_name,
+        room.room_name, room.room_fee, college.college_name,
+        dormitory.dormitory_name, headteacher.headteacher_name, major.major_name
+		FROM student
+        join parents_contact
+		on student.student_id = parents_contact.student_id
+        join stu_class
+		on student.class_id = stu_class.class_id
+        join headteacher
+        on headteacher.headteacher_id = stu_class.headteacher_id
+        join college_major
+		on stu_class.college_major_id = college_major.college_major_id
+        join major
+        on major.major_id = college_major.major_id
+        join college
+        on college.college_id = college_major.college_id
+        join room
+        on room.room_id = student.room_id
+        join dormitory
+        on dormitory.dormitory_id = room.dormitory_id
+        where college.college_id = #{collegeId} and major.major_id = #{majorId}
+    </select>
+
+    <!-- 根据学生某属性获取该专业一个或者多个学生基本信息 -->
+    <select id="getStudentBasicByInfo" resultType="org.graduation.freshmanwelcome.DTO.StudentBasicDTO">
+        SELECT student.student_id,student.exam_id,student.student_name,student.gender,
+        college.college_name,major.major_name,stu_class.class_name,
+        student.id_number,student.cradle,
+        student.pay_status,student.register_status,student.info_status
+		FROM student
+        join stu_class
+		on student.class_id = stu_class.class_id
+        join college_major
+		on stu_class.college_major_id = college_major.college_major_id
+        join major
+        on major.major_id = college_major.major_id
+        join college
+        on college.college_id = college_major.college_id
+        where college.college_id = #{collegeId} and major.major_id = #{majorId} and student.${key} = #{value}
+    </select>
+    <select id="getMajorName" resultType="java.lang.String">
+        SELECT major_name FROM freshman_welcome.major where major_id = #{majorId};
+    </select>
+    <select id="getStudentNum" resultType="org.graduation.freshmanwelcome.DTO.RealTimeDataDTO">
+        SELECT count(student_id)as total_num,
+        sum(if(student.pay_status = 1, 1, 0)) as pay_num,
+        sum(if(student.register_status = 1, 1, 0)) as register_num,
+        sum(if(student.gender = '男',1,0)) as male_num,
+        sum(if(student.gender = '女',1,0)) as female_num,
+        sum(if(student.gender = '男' and student.pay_status = 1,1,0)) as male_pay,
+        sum(if(student.gender = '女' and student.pay_status = 1,1,0)) as female_pay
+        FROM freshman_welcome.student
+        join stu_class
+		on student.class_id = stu_class.class_id
+        join college_major
+		on stu_class.college_major_id = college_major.college_major_id
+        join major
+        on major.major_id = college_major.major_id
+        join college
+        on college.college_id = college_major.college_id
+        where college.college_id = #{collegeId} and major.major_id = #{majorId};
+    </select>
+    <select id="getAddressInfo" resultType="org.graduation.freshmanwelcome.entity.Address">
+        SELECT sum(if(student.cradle = '河北',1,0))as hebei,
+        sum(if(student.cradle = '宁夏',1,0))as ningxia,
+        sum(if(student.cradle = '贵州',1,0))as guizhou,
+        sum(if(student.cradle = '新疆',1,0))as xinjiang,
+        sum(if(student.cradle = '北京',1,0))as beijing,
+        sum(if(student.cradle = '福建',1,0))as fujian,
+        sum(if(student.cradle = '广西',1,0))as guangxi,
+        sum(if(student.cradle = '广东',1,0))as guangdong,
+        sum(if(student.cradle = '黑龙江',1,0))as heilongjiang,
+        sum(if(student.cradle = '浙江',1,0))as zhejiang,
+        sum(if(student.cradle = '青海',1,0))as qinghai,
+        sum(if(student.cradle = '江苏',1,0))as jiangsu,
+        sum(if(student.cradle = '河南',1,0))as henan,
+        sum(if(student.cradle = '云南',1,0))as yunnan,
+        sum(if(student.cradle = '西藏',1,0))as xizang,
+        sum(if(student.cradle = '辽宁',1,0))as liaoning,
+        sum(if(student.cradle = '湖南',1,0))as hunan,
+        sum(if(student.cradle = '香港',1,0))as xianggang,
+        sum(if(student.cradle = '澳门',1,0))as aomen,
+        sum(if(student.cradle = '安徽',1,0))as anhui,
+        sum(if(student.cradle = '江西',1,0))as jiangxi,
+        sum(if(student.cradle = '天津',1,0))as tianjin,
+        sum(if(student.cradle = '湖北',1,0))as hubei,
+        sum(if(student.cradle = '重庆',1,0))as chongqing,
+        sum(if(student.cradle = '甘肃',1,0))as gansu,
+        sum(if(student.cradle = '陕西',1,0))as shanxi2,
+        sum(if(student.cradle = '山西',1,0))as shanxi1,
+        sum(if(student.cradle = '台湾',1,0))as taiwan,
+        sum(if(student.cradle = '山东',1,0))as shandong,
+        sum(if(student.cradle = '吉林',1,0))as jilin,
+        sum(if(student.cradle = '上海',1,0))as shanghai,
+        sum(if(student.cradle = '四川',1,0))as sichuan,
+        sum(if(student.cradle = '内蒙',1,0))as neimenggu,
+        sum(if(student.cradle = '海南',1,0))as hainan
+        FROM freshman_welcome.student
+        join stu_class
+		on student.class_id = stu_class.class_id
+        join college_major
+		on stu_class.college_major_id = college_major.college_major_id
+        join major
+        on major.major_id = college_major.major_id
+        join college
+        on college.college_id = college_major.college_id
+        where college.college_id = #{collegeId} and major.major_id = #{majorId};
+    </select>
+
+</mapper>

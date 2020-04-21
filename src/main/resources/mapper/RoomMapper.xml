@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.graduation.freshmanwelcome.mapper.RoomMapper">
+
+    <select id="queryRoom" resultType="org.graduation.freshmanwelcome.DTO.RoomInfoDTO">
+        SELECT room.room_id, room.room_name,dormitory.dormitory_name,room.max,
+        count(student.student_id) as have_num
+        FROM room
+        left join student
+        on room.room_id = student.room_id
+        join dormitory
+        on dormitory.dormitory_id = room.dormitory_id
+        join college_major
+        on college_major.college_major_id = room.college_major_id
+        join college
+        on college.college_id = college_major.college_id
+        join major
+        on major.major_id = college_major.major_id
+        where college.college_id = #{collegeId} and major.major_id = #{majorId}
+        group by room.room_id
+    </select>
+    <select id="selectNumById" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(student.student_id) as have_num
+        FROM room
+        Left join student
+        on student.room_id = room.room_id
+        where room.room_id = #{roomId}
+    </select>
+    <select id="selectRoomById" resultType="org.graduation.freshmanwelcome.entity.Room"
+            parameterType="java.lang.Integer">
+        SELECT * FROM freshman_welcome.room where room_id = #{RoomId};
+    </select>
+    <select id="getRoomId" resultType="java.lang.Integer">
+        SELECT room.room_id FROM freshman_welcome.room where room.room_name = #{roomName};
+    </select>
+</mapper>
